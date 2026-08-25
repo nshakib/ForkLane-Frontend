@@ -1,11 +1,18 @@
 import { z } from 'zod';
 
-// §3.1 Registration - Role selection default
+
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
 export const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
-  role: z.enum(['USER', 'MANAGER']), // Admin cannot self-register §2
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.enum(['USER', 'MANAGER'], {
+    errorMap: () => ({ message: 'Please select a valid role' }),
+  }),
 });
 
 // §5.2 Order Placement - Server computes total, client sends items
@@ -22,3 +29,7 @@ export const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().min(10).max(500),
 });
+
+
+export type LoginValues = z.infer<typeof loginSchema>;
+export type RegisterValues = z.infer<typeof registerSchema>;
